@@ -1,11 +1,9 @@
-import java.io.*;
 import javafx.application.*;
 import javafx.scene.*;
 import javafx.scene.control.*;
-import javafx.scene.control.Alert.AlertType;
 import javafx.scene.layout.*;
 import javafx.stage.*;
-import javafx.event.*;
+import listener.*;
 
 public class TextEditor extends Application {
 	TextArea text;
@@ -37,16 +35,16 @@ public class TextEditor extends Application {
 		help = new Menu("Help");
 
 		MenuItem newFile = new MenuItem("New");
-		newFile.setOnAction(new NewMenuListener());
+		newFile.setOnAction(new NewMenuListener(text));
 
 		MenuItem saveFile = new MenuItem("Save");
-		saveFile.setOnAction(new SaveMenuListener());
+		saveFile.setOnAction(new SaveMenuListener(primaryStage,text));
 
 		MenuItem loadFile = new MenuItem("Open");
-		loadFile.setOnAction(new LoadMenuListener());
+		loadFile.setOnAction(new LoadMenuListener(primaryStage,text));
 
 		MenuItem quit = new MenuItem("Quit");
-		quit.setOnAction(new QuitMenuListener());
+		quit.setOnAction(new QuitMenuListener(primaryStage));
 
 		MenuItem about = new MenuItem("About");
 		about.setOnAction(new AboutMenuListener());
@@ -62,70 +60,4 @@ public class TextEditor extends Application {
 		stage.show();
 	}
 
-	public class NewMenuListener implements EventHandler<ActionEvent> {
-		public void handle(ActionEvent ae) {
-			text.setText("");
-			text.requestFocus();
-		}
-	}
-
-	public class SaveMenuListener implements EventHandler<ActionEvent> {
-		public void handle(ActionEvent ae) {
-			FileChooser saveFileChoose = new FileChooser();
-			saveFileChoose.setTitle("Save File");
-			saveFileChoose.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Text File","*.txt"));
-			saveFileOnDisk(saveFileChoose.showSaveDialog(primaryStage));
-		}
-
-		public void saveFileOnDisk(File sFile) {
-			try {
-				BufferedWriter writer = new BufferedWriter(new FileWriter(sFile));
-				writer.write(text.getText());
-				writer.close();
-			}
-			catch(IOException ex) {
-				System.out.println("Cannot save file");
-			}
-		}
-	}
-
-	public class LoadMenuListener implements EventHandler<ActionEvent> {
-		public void handle(ActionEvent ae) {
-			FileChooser loadFileChoose = new FileChooser();
-			loadFileChoose.setTitle("Open File");
-			loadFileChoose.getExtensionFilters().addAll(new FileChooser.ExtensionFilter("Text File","*.txt"));
-			loadFileFromDisk(loadFileChoose.showOpenDialog(primaryStage));
-		}
-
-		public void loadFileFromDisk(File lFile) {
-			text.setText("");
-			try {
-				BufferedReader reader = new BufferedReader(new FileReader(lFile));
-				String line;
-				while((line = reader.readLine()) != null) {
-					text.appendText(line+"\n");
-				}
-				reader.close();
-			}
-			catch(IOException ex) {
-				System.out.println("Cannot open file");
-			}
-		}
-	}
-
-	public class QuitMenuListener implements EventHandler<ActionEvent> {
-		public void handle(ActionEvent ae) {
-			primaryStage.close();
-		}
-	}
-
-	public class AboutMenuListener implements EventHandler<ActionEvent> {
-		public void handle(ActionEvent ae) {
-			Alert alert = new Alert(AlertType.INFORMATION);
-			alert.setHeaderText(null);
-			alert.setTitle("About");
-			alert.setContentText("Text Editor 1.0\nCreated By: Ashwin Saxena");
-			alert.showAndWait();
-		}
-	}
 }
